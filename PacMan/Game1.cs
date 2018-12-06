@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Diagnostics;
 
 namespace PacMan
 {
@@ -12,21 +14,35 @@ namespace PacMan
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+
+
+        //Testing out some programming with simple shapes first
+        Vector2 cubePos;
+        int cubeSizeX, cubeSizeY;
+        Texture2D cubeTex;
+        Rectangle cubeRect;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            cubePos = new Vector2(20, 20);
+            cubeSizeX = 50;
+            cubeSizeY = 50;
+
+            //Making a rectangle with texture
+            cubeTex = new Texture2D(graphics.GraphicsDevice, 80, 80);
+            Color[] cubeTexData = new Color[80 * 80];
+            for (int i = 0; i < cubeTexData.Length; i++) cubeTexData[i] = Color.Chocolate;
+            cubeTex.SetData(cubeTexData);
+
+            cubeRect = new Rectangle((int)cubePos.X,(int)cubePos.Y,cubeSizeX, cubeSizeY);
+
 
             base.Initialize();
         }
@@ -44,15 +60,6 @@ namespace PacMan
         }
 
         /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
-
-        /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
@@ -62,8 +69,23 @@ namespace PacMan
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            KeyboardState keyState = Keyboard.GetState();
+            KeyboardState lastKeyState = keyState;
 
+
+            cubeRect.X = keyState.IsKeyDown(Keys.Right) ? cubeRect.X++ : cubeRect.X = cubeRect.X + 0;
+
+
+            if (keyState.IsKeyDown(Keys.Right))
+            {
+                cubeRect.X = cubeRect.X + 5;
+                Debug.WriteLine("Moving cube");
+            }
+
+            //if (keyState.IsKeyDown(Keys.Right) &&) { }
+
+            
+            
             base.Update(gameTime);
         }
 
@@ -74,8 +96,9 @@ namespace PacMan
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            spriteBatch.Draw(cubeTex, cubeRect, Color.White);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
