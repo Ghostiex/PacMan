@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.IO;
 using System.Diagnostics;
 
 namespace PacMan
@@ -14,13 +15,21 @@ namespace PacMan
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        //Create Game Manager
+        GameManager gameManager;
 
+        //Keyboard States (new, old)
+        KeyboardState keyState, lastKeyState;
+        //Array[,] tiles;
+       
 
+        #region Testregion
         //Testing out some programming with simple shapes first
         Vector2 cubePos;
         int cubeSizeX, cubeSizeY;
         Texture2D cubeTex;
         Rectangle cubeRect;
+        #endregion
 
         public Game1()
         {
@@ -31,6 +40,47 @@ namespace PacMan
 
         protected override void Initialize()
         {
+            //Initialise gamemanager
+            gameManager = new GameManager(graphics, Content);
+
+
+
+
+            //With some help from https://stackoverflow.com/questions/19497985/check-every-character-in-a-txt-file
+            string level0Data = null;
+            using (var stream = TitleContainer.OpenStream("map1.txt"))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+
+                    // Exception here pls fix
+                    var tileSizeX = Convert.ToInt32(reader.ReadLine());
+                    var tileSizeY = Convert.ToInt32(reader.ReadLine());
+                    var mapSizeX = Convert.ToInt32(reader.ReadLine());
+                    var mapSizeY = Convert.ToInt32(reader.ReadLine());
+
+                    char[,] map = new char[mapSizeX, mapSizeY];
+
+                    while ((level0Data = reader.ReadLine()) != null)
+                    {
+                        int lineCount = 0;
+                        int length = level0Data.Length;
+                        for (int i = 0; i < lineCount; i++)
+                        {
+                            for (int j = 0; j < length; j++)
+                            {
+
+                            }
+                        }
+                        Debug.WriteLine(level0Data);
+                        lineCount++;
+                    }
+                    reader.Close();
+                }
+            }
+            
+
+            #region Testregion2
             cubePos = new Vector2(20, 20);
             cubeSizeX = 50;
             cubeSizeY = 50;
@@ -42,15 +92,12 @@ namespace PacMan
             cubeTex.SetData(cubeTexData);
 
             cubeRect = new Rectangle((int)cubePos.X,(int)cubePos.Y,cubeSizeX, cubeSizeY);
-
+            #endregion
 
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
@@ -69,23 +116,26 @@ namespace PacMan
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            KeyboardState keyState = Keyboard.GetState();
-            KeyboardState lastKeyState = keyState;
+            //Set the current state of any key presses for the loop
+            keyState = Keyboard.GetState();
 
-
-            cubeRect.X = keyState.IsKeyDown(Keys.Right) ? cubeRect.X++ : cubeRect.X = cubeRect.X + 0;
-
-
-            if (keyState.IsKeyDown(Keys.Right))
+            #region Testregion3
+            //Single Step the cube once to the right if Key Right is pressed
+            if (keyState.IsKeyDown(Keys.Right) && !lastKeyState.IsKeyDown(Keys.Right))
             {
                 cubeRect.X = cubeRect.X + 5;
                 Debug.WriteLine("Moving cube");
             }
+            #endregion
 
-            //if (keyState.IsKeyDown(Keys.Right) &&) { }
 
-            
-            
+
+
+            //Set the Last Key State to be able to press button "once"
+            lastKeyState = keyState;
+
+
+            gameManager.Update();
             base.Update(gameTime);
         }
 
@@ -95,11 +145,19 @@ namespace PacMan
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
+
+            #region Testregion4
+
             spriteBatch.Draw(cubeTex, cubeRect, Color.White);
+
+            #endregion  
+
             spriteBatch.End();
 
+            gameManager.Draw(spriteBatch);
             base.Draw(gameTime);
         }
     }
