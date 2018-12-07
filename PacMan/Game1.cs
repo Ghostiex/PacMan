@@ -22,8 +22,9 @@ namespace PacMan
         KeyboardState keyState, lastKeyState;
         
         
-        //Map Container
-        string[,] tiles;
+
+        //Tile Manager
+        MapLoader mapLoader;
 
 
         #region Testregion
@@ -45,18 +46,13 @@ namespace PacMan
         {
             //Initialise gamemanager
             gameManager = new GameManager(graphics, Content);
+            mapLoader = new MapLoader();
 
-            
-            //Working correctly
-            LoadMap();
             SetWindowSize();
-
 
             //Not yet done
             //DrawMap();
-
-
-
+                       
             #region Testregion2
             cubePos = new Vector2(20, 20);
             cubeSizeX = 50;
@@ -111,8 +107,8 @@ namespace PacMan
             //Set the Last Key State to be able to press button "once"
             lastKeyState = keyState;
 
-
-            gameManager.Update();
+            mapLoader.Update(gameTime);
+            gameManager.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -126,38 +122,31 @@ namespace PacMan
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-
+            mapLoader.Draw(spriteBatch);
             #region Testregion4
 
             spriteBatch.Draw(cubeTex, cubeRect, Color.White);
 
-            #endregion  
-
-            spriteBatch.End();
+            #endregion
 
             gameManager.Draw(spriteBatch);
+            spriteBatch.End();
+
             base.Draw(gameTime);
         }
 
-        private void LoadMap()
-        {
-            string[] line = File.ReadAllLines("map1.txt");
-            tiles = new string[line[0].Length, line.Length];
-            for (int j = 0; j < line.Length; j++)
-            {
-                for (int i = 0; i < line[0].Length; i++)
-                {
-                    tiles[i, j] = line[j].Substring(i, 1);
-                    //To debug map position
-                    //Console.WriteLine(i + " " + j + "=" + tiles[i, j]);
-                }
-            }
-        }
+        
 
-        private void SetWindowSize()
+        /// <summary>
+        /// Set the current size of the game window depending on the width and heigh wanted
+        /// </summary>
+        /// <param name="width">The width in pixels, will be multiplied by 50</param>
+        /// <param name="height">The height in pixels, will be multiplied by 50</param>
+        public void SetWindowSize()
         {
-            graphics.PreferredBackBufferWidth = tiles.GetLength(0) * 50;
-            graphics.PreferredBackBufferHeight = tiles.GetLength(1) * 50;
+            Vector2 currentMapSize = mapLoader.currentMapSize;
+            graphics.PreferredBackBufferWidth = (int)currentMapSize.X * 50;
+            graphics.PreferredBackBufferHeight = (int)currentMapSize.Y * 50;
             graphics.ApplyChanges();
         }
     }

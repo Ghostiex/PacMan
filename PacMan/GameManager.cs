@@ -21,17 +21,14 @@ namespace PacMan
             this.contentManager = content;
         }
 
-        public void Update()
+        public void Update(GameTime gt)
         {
 
         }
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Begin();
-
-
-            sb.End();
+            
         }
 
 
