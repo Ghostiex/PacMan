@@ -20,8 +20,11 @@ namespace PacMan
 
         //Keyboard States (new, old)
         KeyboardState keyState, lastKeyState;
-        //Array[,] tiles;
-       
+        
+        
+        //Map Container
+        string[,] tiles;
+
 
         #region Testregion
         //Testing out some programming with simple shapes first
@@ -43,42 +46,16 @@ namespace PacMan
             //Initialise gamemanager
             gameManager = new GameManager(graphics, Content);
 
-
-
-
-            //With some help from https://stackoverflow.com/questions/19497985/check-every-character-in-a-txt-file
-            string level0Data = null;
-            using (var stream = TitleContainer.OpenStream("map1.txt"))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-
-                    // Exception here pls fix
-                    var tileSizeX = Convert.ToInt32(reader.ReadLine());
-                    var tileSizeY = Convert.ToInt32(reader.ReadLine());
-                    var mapSizeX = Convert.ToInt32(reader.ReadLine());
-                    var mapSizeY = Convert.ToInt32(reader.ReadLine());
-
-                    char[,] map = new char[mapSizeX, mapSizeY];
-
-                    while ((level0Data = reader.ReadLine()) != null)
-                    {
-                        int lineCount = 0;
-                        int length = level0Data.Length;
-                        for (int i = 0; i < lineCount; i++)
-                        {
-                            for (int j = 0; j < length; j++)
-                            {
-
-                            }
-                        }
-                        Debug.WriteLine(level0Data);
-                        lineCount++;
-                    }
-                    reader.Close();
-                }
-            }
             
+            //Working correctly
+            LoadMap();
+            SetWindowSize();
+
+
+            //Not yet done
+            //DrawMap();
+
+
 
             #region Testregion2
             cubePos = new Vector2(20, 20);
@@ -147,6 +124,7 @@ namespace PacMan
         {
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
             spriteBatch.Begin();
 
             #region Testregion4
@@ -159,6 +137,28 @@ namespace PacMan
 
             gameManager.Draw(spriteBatch);
             base.Draw(gameTime);
+        }
+
+        private void LoadMap()
+        {
+            string[] line = File.ReadAllLines("map1.txt");
+            tiles = new string[line[0].Length, line.Length];
+            for (int j = 0; j < line.Length; j++)
+            {
+                for (int i = 0; i < line[0].Length; i++)
+                {
+                    tiles[i, j] = line[j].Substring(i, 1);
+                    //To debug map position
+                    //Console.WriteLine(i + " " + j + "=" + tiles[i, j]);
+                }
+            }
+        }
+
+        private void SetWindowSize()
+        {
+            graphics.PreferredBackBufferWidth = tiles.GetLength(0) * 50;
+            graphics.PreferredBackBufferHeight = tiles.GetLength(1) * 50;
+            graphics.ApplyChanges();
         }
     }
 }
